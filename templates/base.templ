@@ -1,0 +1,23 @@
+package templates
+
+templ Base(content templ.Component) {
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Go Webstore</title>
+		<link rel="stylesheet" href="assets/styles/styles.css">
+	</head>
+	<div class="nav">
+		<a href="/store">Store</a>
+		<a href="/dbQueries">View All Tables</a>
+		<a href="/admin">Admin</a>
+		<a href="/order_entry">Order Entry</a>
+	</div>
+	
+	<body>
+		@header()
+		@content
+		@footer()
+	</body>
+	</html>
+}

@@ -1,0 +1,99 @@
+package templates
+
+import (
+"fmt"
+"go-store/types"
+"time"
+)
+
+templ Store() {
+    <!DOCTYPE html>
+    <head>
+        <link rel="stylesheet" href="../assets/styles/styles.css">
+    </head>
+    <body>
+        <fieldset>
+            <legend>Product Information</legend>
+            <div class="form-container">
+                <div class="form-fields">
+                    <form action="/purchase" method="post">
+                        <label for="firstName">First Name*:</label>
+                        <input type="text" id="firstName" name="firstName" required pattern="[A-Za-z\s']+" />
+
+                        <label for="lastName">Last Name*:</label>
+                        <input type="text" id="lastName" name="lastName" required pattern="[A-Za-z\s']+" />
+
+                        <label for="email">Email*:</label>
+                        <input type="email" id="email" name="email" required />
+
+                        <label for="product">Product*:</label>
+                        <select id="product" name="product" required onchange="showProductImage()">
+                            <option value="">Select an item</option>
+                            <option value="Spoon">Spoon - $1.00</option>
+                            <option value="Fork">Fork - $1.50</option>
+                            <option value="Knife">Knife - $2.00</option>
+                        </select>
+
+                        <label for="quantity">Quantity*:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="100" required />
+						<label>Would you like to round up for a donation?</label>
+						<label>
+							<input type="radio" name="donation" value="yes" /> Yes
+						</label>
+						<label>
+							<input type="radio" name="donation" value="no" checked /> No
+						</label>
+                        <input type="hidden" name="timestamp" value={ fmt.Sprintf("%d", time.Now().Unix()) }/>
+
+                        <button type="submit">Purchase</button>
+                    </form>
+                </div>
+                <div class="product-image">
+					<h3 id="productTitle">Select product to see image</h3> 
+					<img id="productImage" src="" alt="Product image"  />
+				</div>
+            </div>
+			
+
+        </fieldset>
+		
+    </body>
+    <script>
+        function showProductImage() {
+            const productSelect = document.getElementById("product");
+            const productImage = document.getElementById("productImage");
+            const product = productSelect.value;
+            const productImages = {
+                "Spoon": "assets/images/spoon.jpeg",
+                "Fork": "assets/images/fork.jpeg",
+                "Knife": "assets/images/knife.jpeg"
+            };
+
+            if (product) {
+                productImage.src = productImages[product];
+                productImage.alt = product + " image"; 
+            } else {
+                productImage.src = ""; 
+                productImage.alt = "Product image"; 
+            }
+        }
+    </script>
+}
+
+
+templ PurchaseConfirmation(purchaseInformation types.PurchaseInfo) {
+    <div>
+    <a href="/store">Return to form</a>
+        <h2>Purchase Confirmation</h2>
+        <p>Thanks for visitin, { fmt.Sprintf("%s", purchaseInformation.FirstName) }!</p>
+        <p>You bought { fmt.Sprintf("%d", purchaseInformation.Quantity) } of { fmt.Sprintf("%s", purchaseInformation.Product) }.</p>
+        <p>Subtotal: ${ fmt.Sprintf("%.2f", purchaseInformation.Subtotal) }</p>
+        <p>Tax: ${ fmt.Sprintf("%.2f", purchaseInformation.Tax) }</p>
+        <p>Total: ${ fmt.Sprintf("%.2f", purchaseInformation.Total) }</p>
+        if purchaseInformation.Donation {
+            <p>Donation: ${ fmt.Sprintf("%.2f", purchaseInformation.DonationAmount) }</p>
+            <p>Total including Donation: ${ fmt.Sprintf("%.2f", purchaseInformation.TotalWithDonation) }</p>
+        }
+        <p>A confirmation email has hopefully been sent to { fmt.Sprintf("%s", purchaseInformation.Email) }.</p>
+    </div>
+}

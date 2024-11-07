@@ -1,0 +1,187 @@
+/* assets/css/styles.css */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: gray;
+    color: black;
+    font-size: 20px;
+    line-height: 1.6;
+    padding: 20px;
+}
+p {
+	text-align: center;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+header {
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bolder;
+    background-color: grey;
+    margin-bottom: 10px;
+}
+.nav {
+    border: #333 solid 1px;
+    justify-content: space-around; 
+    background-color: #333;
+    padding: 10px 10px;
+}
+.nav a{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding: 10px 10px;
+    color: white;
+    text-decoration: none;
+}
+.nav :visited {
+    color: white; 
+}
+
+.nav :hover {
+    color: grey;
+    font-weight: bold;
+}
+
+h2 {
+    background-color: grey;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
+    
+}
+h3 {
+    color: #ffffff;
+    text-align: center;
+    font-style: italic;
+    font-weight: lighter;
+    font-size: 20px;
+
+}
+
+fieldset {
+    border: 4px solid white;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: lightgray;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+legend {
+    font-weight: bold;
+	font-size: 20px;
+    color: white;
+    background-color: #333;
+    padding: 10px 20px;
+}
+
+label {
+    display: block;
+    margin: 15px 0 5px;
+}
+
+input[type="number"], select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: gray;
+    outline: none;
+}
+
+button {
+    margin-top: 20px;
+    background-color: #e74c3c;
+    color: white;
+    padding: 20px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #c0392b;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: gray;
+    color: #ffffff;
+    margin-top: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse; 
+    margin: 20px 0;
+    font-size: 1em; 
+    background-color: #ffffff; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
+
+th, td {
+    padding: 12px 15px; 
+    border: 1px solid #ddd; 
+    text-align: left; 
+}
+
+th {
+    background-color: #f2f2f2; 
+    color: #333; 
+    font-weight: bold; 
+}
+
+
+.form-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.form-fields {
+    flex: 1;
+}
+
+.product-image {
+    display: flex;
+    justify-content: center;
+	flex-direction: column; 
+    align-items: center; 
+	text-align: center;
+}
+
+.product-image img {
+	width: 400px;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+#productTitle {
+    font-size: 1.5; 
+	padding: 15px;
+    color: gray;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2em;
+    box-sizing: border-box;
+}

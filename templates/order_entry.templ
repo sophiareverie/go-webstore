@@ -1,0 +1,172 @@
+package templates
+
+import (
+	"fmt"
+	"time"
+)
+
+templ OrderEntry() {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="../assets/styles/styles.css">
+        <style>
+            .container {
+                display: flex;
+                align-items: flex-start;
+
+            }
+            main {
+                flex: 1;
+                padding-right: 20px;
+            }
+            aside {
+                flex: 1;
+                max-width: 300px;
+            }
+            .customer-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            .customer-table th, .customer-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            .customer-table tr:hover {
+                background-color: #f1f1f1;
+            }
+            .highlight {
+                background-color: #e0f7fa;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Main Form Section -->
+            <main>
+                <form action="/purchase" method="post">
+                    <fieldset>
+                        <legend>Personal Information</legend>
+                        <div class="form-container">
+                            <label for="firstName">First Name*:</label>
+                            <input type="text" id="firstName" name="firstName" required pattern="[A-Za-z\s']+" onkeyup="showHint(this.value, 'first')" />
+
+                            <label for="lastName">Last Name*:</label>
+                            <input type="text" id="lastName" name="lastName" required pattern="[A-Za-z\s']+" onkeyup="showHint(this.value, 'last')" />
+
+                            <label for="email">Email*:</label>
+                            <input type="email" id="email" name="email" required onkeyup="showHint(this.value, 'email')"/>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Product Information</legend>
+                        <div class="form-container">
+                            <label for="product">Product*:</label>
+                            <select id="product" name="product" required onchange="updateAvailableQuantity()">
+                                <option value="">Select an item</option>
+                                <option value="Spoon">Spoon - $1.00</option>
+                                <option value="Fork">Fork - $1.50</option>
+                                <option value="Knife">Knife - $2.00</option>
+                            </select>
+
+                            <label for="available">Available Quantity:</label>
+                            <input type="text" id="available" name="available" readonly />
+
+                            <label for="quantity">Quantity*:</label>
+                            <input type="number" id="quantity" name="quantity" min="1" max="100" required />
+
+                            <input type="hidden" name="timestamp" value={ fmt.Sprintf("%d", time.Now().Unix()) } />
+
+                            <button type="submit">Purchase</button>
+                        </div>
+                    </fieldset>
+
+                    <button type="reset">Clear All Fields</button>
+                </form>
+            </main>
+
+            <!-- Customer List Section -->
+            <aside>
+                <h3>Customer List</h3>
+                <table class="customer-table" id="customerTable">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerList">
+                        <!-- JavaScript will populate this area with customer data -->
+                    </tbody>
+                </table>
+                <p id="noMatchMessage" style="display: none;">No matching customers found.</p>
+            </aside>
+        </div>
+
+        <script>
+            function updateAvailableQuantity() {
+                const product = document.getElementById("product").value;
+                if (product) {
+                    fetch(`/get_product_quantity?product=${encodeURIComponent(product)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById("available").value = data.quantity;
+                        })
+                        .catch(error => console.error("Error fetching quantity:", error));
+                } else {
+                    document.getElementById("available").value = "";
+                }
+            }
+
+            function showHint(value, fieldType) {
+                if (value.length === 0) {
+                    document.getElementById("customerList").innerHTML = "";
+                    document.getElementById("noMatchMessage").style.display = "none";
+                    return;
+                }
+
+                fetch(`/get_customers?searchTerm=${encodeURIComponent(value)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        //console.log("Response data:", data); 
+
+                        const tableBody = document.getElementById("customerList");
+                        tableBody.innerHTML = "";
+                        
+                        if (data.message) {
+                            document.getElementById("noMatchMessage").style.display = "block";
+                            return;
+                        }
+
+                        if (data.length > 0) {
+                            document.getElementById("noMatchMessage").style.display = "none";
+                            data.forEach(customer => {
+                                const row = document.createElement("tr");
+                                row.innerHTML = `
+                                    <td>${customer.FirstName}</td>
+                                    <td>${customer.LastName}</td>
+                                    <td>${customer.Email}</td>
+                                `;
+                                row.onclick = function() {
+                                    document.getElementById("firstName").value = customer.firstName;
+                                    document.getElementById("lastName").value = customer.lastName;
+                                    document.getElementById("email").value = customer.email;
+                                };
+                                tableBody.appendChild(row);
+                            });
+                        } else {
+                            document.getElementById("noMatchMessage").style.display = "block";
+                        }
+                    })
+                    .catch(error => console.error("Error fetching customers:", error));
+                }
+
+        </script>
+    </body>
+    </html>
+    `
+}

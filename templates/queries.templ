@@ -1,0 +1,113 @@
+package templates
+
+import (
+    "go-store/types"
+    "fmt"
+    "time"
+    )
+templ Queries(CustomerResults types.CustomerResults, Orders []types.Order, Products []types.Product, Quant1 int, Quant2 int) {
+
+    
+    <!DOCTYPE html>
+    <head>
+      <link rel="stylesheet" href="../assets/styles/styles.css">
+    </head>    
+    
+    <h2>Customers</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+        for _, customer := range CustomerResults.Customers {
+            <tr>
+                <td>{ fmt.Sprintf("%d", customer.ID) }</td>
+                <td>{ customer.FirstName }</td>
+                <td>{ customer.LastName }</td>
+                <td>{ customer.Email }</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <body>
+    <p>Total count: {fmt.Sprintf("%d", len(CustomerResults.Customers))}</p>
+    <p>Customer 2 by id : {CustomerResults.Customer2.Email} </p>
+    <p>Customer 3 by id : {CustomerResults.Customer3}</p>
+    <p>Customer by email : {CustomerResults.Customer4.Email}</p>
+    <p>Customer by email: nonexistent {CustomerResults.Customer5Find}</p>
+    <p>Adding customer to the database...</p>
+    <p>Added: {CustomerResults.Customer5.Email}</p>
+    <p>. </p>
+    <p>. </p>
+    <p>No orders yet</p>
+    <p>Adding an order...</p>
+
+    </body>
+
+    <h2>Orders</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product ID</th>
+                <th>Customer ID</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Tax</th>
+                <th>Donation</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+        for _, order := range Orders {
+            <tr>
+                <td>{ fmt.Sprintf("%d", order.ID) }</td>
+                <td>{ fmt.Sprintf("%d", order.ProductID) }</td>
+                <td>{ fmt.Sprintf("%d", order.CustomerID) }</td>
+                <td>{ fmt.Sprintf("%d", order.Quantity) }</td>
+                <td>${ fmt.Sprintf("%.2f", order.Price) }</td>
+                <td>${ fmt.Sprintf("%.2f", order.Tax) }</td>
+                <td>${ fmt.Sprintf("%.2f", order.Donation) }</td>
+                <td>{ time.UnixMilli(int64(order.Timestamp)).String() }</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <h2>Products</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>In Stock</th>
+                <th>Image Path</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+        for _, product := range Products {
+            <tr>
+                <td>{ product.Name }</td>
+                <td>{ fmt.Sprintf("%d", product.InStock) }</td>
+                <td>{ product.Image }</td>
+                <td>${ fmt.Sprintf("%.2f", product.Price) }</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <body>
+    
+    <p>Selling 5 knives </p>
+    <p>Quantity after selling: {fmt.Sprintf("%d",Quant1)}</p>
+    <p>Selling 10 knives </p>
+    <p>Quantity after selling: {fmt.Sprintf("%d",Quant2)}</p>
+
+    </body>
+}
+
