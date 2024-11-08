@@ -84,6 +84,7 @@ templ Queries(CustomerResults types.CustomerResults, Orders []types.Order, Produ
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Name</th>
                 <th>In Stock</th>
                 <th>Image Path</th>
@@ -93,6 +94,7 @@ templ Queries(CustomerResults types.CustomerResults, Orders []types.Order, Produ
         <tbody>
         for _, product := range Products {
             <tr>
+                <td>{ fmt.Sprintf("%d", product.ID) }</td>
                 <td>{ product.Name }</td>
                 <td>{ fmt.Sprintf("%d", product.InStock) }</td>
                 <td>{ product.Image }</td>

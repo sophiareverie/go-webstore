@@ -20,18 +20,16 @@ templ OrderEntry() {
             .form-container {
                 display: flex;
                 flex-direction: column;
-                gap: 10px; /* Adds spacing between each element */
-                width: 100%;
-                max-width: 500px;
+                gap: 5px; 
+                max-width: 700px;
             }
             label {
                 display: inline-block;
                 margin-bottom: 5px;
             }
             input, select, button {
-                max-width: 500px;
+                max-width: 700px;
             }
-
             main {
                 flex: 1;
                 padding-right: 20px;
@@ -60,7 +58,6 @@ templ OrderEntry() {
 
     <body>
         <div class="container">
-            <!-- Main Form Section -->
             <main>
                 <form id="orderForm" hx-post="/purchasebrief" hx-trigger="submit" hx-target="#asideContent" hx-swap="innerHTML">                    <fieldset>
                         <legend>Personal Information</legend>
@@ -91,7 +88,7 @@ templ OrderEntry() {
                             <input type="text" id="available" name="available" readonly />
 
                             <label for="quantity">Quantity*:</label>
-                            <input type="number" id="quantity" name="quantity" min="1" max="100" required />
+                            <input type="number" id="quantity" name="quantity" min="1" required />
 
                             <input type="hidden" name="timestamp" value={ fmt.Sprintf("%d", time.Now().Unix()) } />
 
@@ -103,7 +100,6 @@ templ OrderEntry() {
                 </form>
             </main>
 
-            <!-- Customer List Section -->
             <aside id="asideContent">
                 <h3>Customer List</h3>
                 <table class="customer-table" id="customerTable">
@@ -115,7 +111,6 @@ templ OrderEntry() {
                         </tr>
                     </thead>
                     <tbody id="customerList">
-                        <!-- JavaScript will populate this area with customer data -->
                     </tbody>
                 </table>
                 <p id="noMatchMessage" style="display: none;">No matching customers found.</p>
@@ -123,13 +118,25 @@ templ OrderEntry() {
         </div>
 
         <script>
+        document.getElementById('orderForm').addEventListener('htmx:afterRequest', function(event) {
+    // Check if the request is the one you want to reset the form after
+    if (event.detail.xhr.status === 200) {
+        document.getElementById('orderForm').reset();
+    }
+});
+
             function updateAvailableQuantity() {
                 const product = document.getElementById("product").value;
+                const quantityInput = document.getElementById("quantity");
+
                 if (product) {
                     fetch(`/get_product_quantity?product=${encodeURIComponent(product)}`)
                         .then(response => response.json())
                         .then(data => {
+                            const availableQuantity = data.quantity;
                             document.getElementById("available").value = data.quantity;
+                            quantityInput.max = availableQuantity;
+
                         })
                         .catch(error => console.error("Error fetching quantity:", error));
                 } else {
@@ -138,6 +145,11 @@ templ OrderEntry() {
             }
 
             function showHint(value, fieldType) {
+
+                document.getElementById("noMatchMessage").style.display = "none";
+                const tableBody = document.getElementById("customerList");
+    
+
                 if (value.length === 0) {
                     document.getElementById("customerList").innerHTML = "";
                     document.getElementById("noMatchMessage").style.display = "none";
@@ -183,5 +195,4 @@ templ OrderEntry() {
         </script>
     </body>
     </html>
-    `
 }

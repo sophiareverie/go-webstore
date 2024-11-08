@@ -160,7 +160,6 @@ func AddOrder(conn *sql.DB, productID, customerID, quantity int, price, tax, don
 	if err != nil {
 		return 0, err
 	}
-	fmt.Printf("Inserted order with ID: %d\n", orderID)
 
 	return orderID, nil
 }

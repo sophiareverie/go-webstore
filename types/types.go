@@ -23,7 +23,7 @@ type Order struct {
 	Price        float64
 	Tax          float64
 	Donation     float64
-	Timestamp    int64 // Use int64 for timestamp
+	Timestamp    int64
 	CustomerName string
 	ProductName  string
 }

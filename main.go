@@ -20,6 +20,7 @@ import (
 
 var conn *sql.DB
 var CustomerResults types.CustomerResults
+var OrdersFr []types.Order
 var Orders []types.Order
 var checker = ""
 var Products []types.Product
@@ -30,7 +31,11 @@ func initialize(conn *sql.DB) {
 	CustomerResults.Customers, err = db.GetAllCustomers(conn)
 	if err != nil {
 	}
-	Orders, err = db.GetAllOrdersFriendly(conn)
+	Orders, err = db.GetAllOrders(conn)
+	if err != nil || len(Orders) == 0 {
+		checker = "No orders yet!"
+	}
+	OrdersFr, err = db.GetAllOrdersFriendly(conn)
 	if err != nil || len(Orders) == 0 {
 		checker = "No orders yet!"
 	}
@@ -95,57 +100,44 @@ func main() {
 
 	e.GET("/admin", func(ctx echo.Context) error {
 		initialize(conn)
-
-		return Render(ctx, http.StatusOK, templates.Base(templates.Admin(CustomerResults, Orders, Products, checker)))
+		return Render(ctx, http.StatusOK, templates.Base(templates.Admin(CustomerResults, OrdersFr, Products, checker)))
 	})
 	e.GET("/get_product_quantity", func(ctx echo.Context) error {
-		// Retrieve the product name from the query parameters
 		product := ctx.QueryParam("product")
 
-		// Mock function to get quantity based on the product name
-		// Replace this with your actual function for retrieving product quantity
 		quantity, err := db.GetProductQuantity(conn, product)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Product not found"})
 		}
 
-		// Return the quantity as a JSON response
 		return ctx.JSON(http.StatusOK, map[string]int{"quantity": quantity})
 	})
 	e.GET("/get_customers", func(ctx echo.Context) error {
-		// Initialize the database connection
 		initialize(conn)
 
-		// Retrieve the search term from the query parameters
 		searchTerm := ctx.QueryParam("searchTerm")
 
-		// Call GetAllCustomers to get all customers from the database
 		customers, err := db.GetAllCustomers(conn)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, map[string]string{"message": "Error retrieving customers"})
 		}
 
-		// If searchTerm is provided, filter the customers
 		var filteredCustomers []types.Customer
 		if searchTerm != "" {
 			for _, customer := range customers {
-				// Search customers based on first or last name (case insensitive)
 				if strings.Contains(strings.ToLower(customer.FirstName), strings.ToLower(searchTerm)) ||
 					strings.Contains(strings.ToLower(customer.LastName), strings.ToLower(searchTerm)) {
 					filteredCustomers = append(filteredCustomers, customer)
 				}
 			}
 		} else {
-			// If no searchTerm is provided, return all customers
 			filteredCustomers = customers
 		}
 
-		// If no customers match the search term, return a message
 		if len(filteredCustomers) == 0 {
 			return ctx.JSON(http.StatusOK, map[string]string{"message": "No matching customers found"})
 		}
 
-		// Return the filtered customers as JSON
 		return ctx.JSON(http.StatusOK, filteredCustomers)
 	})
 
@@ -227,16 +219,11 @@ func main() {
 		subtotal := price * float64(quantityInt)
 		tax := subtotal * 0.06
 		total := subtotal + tax
-		donation := ctx.FormValue("donation") == "yes"
-		donationAmount := 3.0 // 3 dolla donation
-		totalWithDonation := total
-
-		if donation {
-			totalWithDonation += donationAmount
-		}
+		// fmt.Printf("%d", productID)
+		// fmt.Printf("%d", customerID)
 
 		// Add the order to the database
-		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, totalWithDonation-total)
+		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, 0)
 
 		confirmationMessage := fmt.Sprintf(`
 			<h3>Purchase Confirmation</h3>
