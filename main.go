@@ -206,6 +206,46 @@ func main() {
 		return Render(ctx, http.StatusOK, templates.Base(templates.PurchaseConfirmation(purchaseInfo)))
 	})
 
+	e.POST("/purchasebrief", func(ctx echo.Context) error {
+		firstName := ctx.FormValue("firstName")
+		lastName := ctx.FormValue("lastName")
+		email := ctx.FormValue("email")
+		customerID, _ := db.AddCustomer(conn, firstName, lastName, email)
+		product := ctx.FormValue("product")
+
+		var productObj types.Product
+		productObj, _ = db.GetProductByName(conn, product)
+		var productID = productObj.ID
+
+		quantity := ctx.FormValue("quantity")
+		quantityInt, err := strconv.Atoi(quantity)
+		if err != nil {
+			return ctx.String(http.StatusBadRequest, "Invalid quantity")
+		}
+
+		var price = productObj.Price
+		subtotal := price * float64(quantityInt)
+		tax := subtotal * 0.06
+		total := subtotal + tax
+		donation := ctx.FormValue("donation") == "yes"
+		donationAmount := 3.0 // 3 dolla donation
+		totalWithDonation := total
+
+		if donation {
+			totalWithDonation += donationAmount
+		}
+
+		// Add the order to the database
+		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, totalWithDonation-total)
+
+		confirmationMessage := fmt.Sprintf(`
+			<h3>Purchase Confirmation</h3>
+			<p>Order submitted for: %s %s %d %s %.2f</p>
+		`, firstName, lastName, quantityInt, product, total)
+
+		return ctx.HTML(http.StatusOK, confirmationMessage)
+	})
+
 	e.Logger.Fatal(e.Start(":8000"))
 }
 

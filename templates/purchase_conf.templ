@@ -1,0 +1,22 @@
+package templates
+
+import (
+"fmt"
+"go-store/types"
+)
+
+templ PurchaseConfirmation(purchaseInformation types.PurchaseInfo) {
+    <div>
+        <h2>Purchase Confirmation</h2>
+        <p>Thanks for visitin, { fmt.Sprintf("%s", purchaseInformation.FirstName) }!</p>
+        <p>You bought { fmt.Sprintf("%d", purchaseInformation.Quantity) } of { fmt.Sprintf("%s", purchaseInformation.Product) }.</p>
+        <p>Subtotal: ${ fmt.Sprintf("%.2f", purchaseInformation.Subtotal) }</p>
+        <p>Tax: ${ fmt.Sprintf("%.2f", purchaseInformation.Tax) }</p>
+        <p>Total: ${ fmt.Sprintf("%.2f", purchaseInformation.Total) }</p>
+        if purchaseInformation.Donation {
+            <p>Donation: ${ fmt.Sprintf("%.2f", purchaseInformation.DonationAmount) }</p>
+            <p>Total including Donation: ${ fmt.Sprintf("%.2f", purchaseInformation.TotalWithDonation) }</p>
+        }
+        <p>A confirmation email has hopefully been sent to { fmt.Sprintf("%s", purchaseInformation.Email) }.</p>
+    </div>
+}

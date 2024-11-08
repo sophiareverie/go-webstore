@@ -17,13 +17,27 @@ templ OrderEntry() {
                 align-items: flex-start;
 
             }
+            .form-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px; /* Adds spacing between each element */
+                width: 100%;
+                max-width: 500px;
+            }
+            label {
+                display: inline-block;
+                margin-bottom: 5px;
+            }
+            input, select, button {
+                max-width: 500px;
+            }
+
             main {
                 flex: 1;
                 padding-right: 20px;
             }
             aside {
                 flex: 1;
-                max-width: 300px;
             }
             .customer-table {
                 width: 100%;
@@ -35,19 +49,20 @@ templ OrderEntry() {
                 padding: 8px;
             }
             .customer-table tr:hover {
-                background-color: #f1f1f1;
+                background-color: yellow;
             }
             .highlight {
                 background-color: #e0f7fa;
             }
         </style>
     </head>
+    <script src="https://unpkg.com/htmx.org"></script>
+
     <body>
         <div class="container">
             <!-- Main Form Section -->
             <main>
-                <form action="/purchase" method="post">
-                    <fieldset>
+                <form id="orderForm" hx-post="/purchasebrief" hx-trigger="submit" hx-target="#asideContent" hx-swap="innerHTML">                    <fieldset>
                         <legend>Personal Information</legend>
                         <div class="form-container">
                             <label for="firstName">First Name*:</label>
@@ -89,7 +104,7 @@ templ OrderEntry() {
             </main>
 
             <!-- Customer List Section -->
-            <aside>
+            <aside id="asideContent">
                 <h3>Customer List</h3>
                 <table class="customer-table" id="customerTable">
                     <thead>
@@ -152,9 +167,9 @@ templ OrderEntry() {
                                     <td>${customer.Email}</td>
                                 `;
                                 row.onclick = function() {
-                                    document.getElementById("firstName").value = customer.firstName;
-                                    document.getElementById("lastName").value = customer.lastName;
-                                    document.getElementById("email").value = customer.email;
+                                    document.getElementById("firstName").value = customer.FirstName;
+                                    document.getElementById("lastName").value = customer.LastName;
+                                    document.getElementById("email").value = customer.Email;
                                 };
                                 tableBody.appendChild(row);
                             });
