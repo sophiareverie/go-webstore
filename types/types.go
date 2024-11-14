@@ -1,11 +1,12 @@
 package types
 
 type Product struct {
-	ID      int
-	Name    string
-	Image   string
-	Price   float64
-	InStock int
+	ID       int
+	Name     string
+	Image    string
+	Price    float64
+	InStock  int
+	Inactive int
 }
 
 type Customer struct {

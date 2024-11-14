@@ -119,11 +119,10 @@ templ OrderEntry() {
 
         <script>
         document.getElementById('orderForm').addEventListener('htmx:afterRequest', function(event) {
-    // Check if the request is the one you want to reset the form after
-    if (event.detail.xhr.status === 200) {
-        document.getElementById('orderForm').reset();
-    }
-});
+            if (event.detail.xhr.status === 200) {
+                document.getElementById('orderForm').reset();
+            }
+        });
 
             function updateAvailableQuantity() {
                 const product = document.getElementById("product").value;

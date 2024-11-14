@@ -1,11 +1,12 @@
 package templates
 
 import (
-"fmt"
-"time"
+    "fmt"
+    "time"
+    "go-store/types"
 )
 
-templ Store() {
+templ Store(Products []types.Product) {
     <!DOCTYPE html>
     <head>
         <link rel="stylesheet" href="../assets/styles/styles.css">
@@ -28,9 +29,11 @@ templ Store() {
                         <label for="product">Product*:</label>
                         <select id="product" name="product" required onchange="showProductImage()">
                             <option value="">Select an item</option>
-                            <option value="Spoon">Spoon - $1.00</option>
-                            <option value="Fork">Fork - $1.50</option>
-                            <option value="Knife">Knife - $2.00</option>
+                            for _, product := range Products {
+                                if (product.Inactive == 0) {
+                                    <option value={ product.Name } > { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
+                                }
+                            }
                         </select>
 
                         <label for="quantity">Quantity*:</label>
@@ -62,14 +65,9 @@ templ Store() {
             const productSelect = document.getElementById("product");
             const productImage = document.getElementById("productImage");
             const product = productSelect.value;
-            const productImages = {
-                "Spoon": "assets/images/spoon.jpeg",
-                "Fork": "assets/images/fork.jpeg",
-                "Knife": "assets/images/knife.jpeg"
-            };
 
             if (product) {
-                productImage.src = productImages[product];
+                productImage.src = product;
                 productImage.alt = product + " image"; 
             } else {
                 productImage.src = ""; 

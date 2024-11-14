@@ -15,7 +15,8 @@ CREATE TABLE product (
     product_name VARCHAR(100),
     image_name VARCHAR(255),
     price DECIMAL(6,2),
-    in_stock INT
+    in_stock INT,
+    inactive TINYINT DEFAULT 0 
 );
 
 CREATE TABLE orders (
@@ -34,6 +35,6 @@ CREATE TABLE orders (
 INSERT INTO customer (first_name, last_name, email) VALUES ('Jason', 'Derulo', 'jd@mines.edu');
 INSERT INTO customer (first_name, last_name, email) VALUES ('Donald', 'Trump', 'dt@mines.edu');
 
-INSERT INTO product (product_name, image_name, price, in_stock) VALUES ('Fork', 'assets/images/fork.jpeg', 1.50, 24);
-INSERT INTO product (product_name, image_name, price, in_stock) VALUES ('Spoon', 'assets/images/spoon.jpeg', 1.00, 3);
-INSERT INTO product (product_name, image_name, price, in_stock) VALUES ('Knife', 'assets/images/knife.jpeg', 2.00, 10);
+INSERT INTO product (product_name, image_name, price, in_stock, inactive) VALUES ('Fork', 'assets/images/fork.jpeg', 1.50, 24, 0);
+INSERT INTO product (product_name, image_name, price, in_stock, inactive) VALUES ('Spoon', 'assets/images/spoon.jpeg', 1.00, 3, 0);
+INSERT INTO product (product_name, image_name, price, in_stock, inactive) VALUES ('Knife', 'assets/images/knife.jpeg', 2.00, 0, 1);

@@ -71,7 +71,7 @@ func main() {
 	e.GET("/store", func(ctx echo.Context) error {
 		initialize(conn)
 
-		return Render(ctx, http.StatusOK, templates.Base(templates.Store()))
+		return Render(ctx, http.StatusOK, templates.Base(templates.Store(Products)))
 	})
 
 	e.GET("/dbQueries", func(ctx echo.Context) error {
@@ -102,6 +102,11 @@ func main() {
 		initialize(conn)
 		return Render(ctx, http.StatusOK, templates.Base(templates.Admin(CustomerResults, OrdersFr, Products, checker)))
 	})
+
+	e.GET("/products", func(ctx echo.Context) error {
+		return Render(ctx, http.StatusOK, templates.Base(templates.Products(Products)))
+	})
+
 	e.GET("/get_product_quantity", func(ctx echo.Context) error {
 		product := ctx.QueryParam("product")
 
@@ -148,55 +153,96 @@ func main() {
 
 	})
 
-	e.POST("/purchase", func(ctx echo.Context) error {
+	e.POST("/product", func(ctx echo.Context) error {
+		var formData struct {
+			ItemName  string `json:"itemName"`
+			ItemImage string `json:"itemImage"`
+			Quantity  string `json:"quantity"`
+			Price     string `json:"price"`
+			Inactive  int    `json:"inactive"`
+			Action    string `json:"action"`
+		}
 
-		firstName := ctx.FormValue("firstName")
-		lastName := ctx.FormValue("lastName")
-		email := ctx.FormValue("email")
-		customerID, _ := db.AddCustomer(conn, firstName, lastName, email)
-		product := ctx.FormValue("product")
+		// Bind the incoming JSON data to the struct
+		if err := ctx.Bind(&formData); err != nil {
+			fmt.Println("Error binding data:", err) // Log the error
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": fmt.Sprintf("Error binding data: %v", err),
+			})
+		}
+		if formData.Action == "" || formData.Action == "fetch" {
+			Products, err := db.GetAllProducts(conn)
+			if err != nil {
+				return ctx.JSON(http.StatusInternalServerError, map[string]string{
+					"error": "Failed to retrieve products.",
+				})
+			}
+			return ctx.JSON(http.StatusOK, map[string]interface{}{
+				"products": Products,
+			})
+		}
 
-		var productObj types.Product
-		productObj, _ = db.GetProductByName(conn, product)
-		var productID = productObj.ID
-
-		quantity := ctx.FormValue("quantity")
-		timestamp := ctx.FormValue("timestamp")
-		quantityInt, err := strconv.Atoi(quantity)
+		quantity, err := strconv.Atoi(formData.Quantity) // Convert string to int
 		if err != nil {
-			return ctx.String(http.StatusBadRequest, "Invalid quantity")
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid quantity value",
+			})
 		}
 
-		var price = productObj.Price
-		subtotal := price * float64(quantityInt)
-		tax := subtotal * 0.06
-		total := subtotal + tax
-		donation := ctx.FormValue("donation") == "yes"
-		donationAmount := 3.0 //3 dolla donation
-		totalWithDonation := total
-
-		if donation {
-			totalWithDonation += donationAmount
+		price, err := strconv.ParseFloat(formData.Price, 64) // Convert string to float64
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid price value",
+			})
 		}
 
-		purchaseInfo := types.PurchaseInfo{
-			FirstName:         firstName,
-			LastName:          lastName,
-			Email:             email,
-			Quantity:          quantityInt,
-			Product:           product,
-			Subtotal:          subtotal,
-			Tax:               tax,
-			Total:             total,
-			Donation:          donation,
-			DonationAmount:    donationAmount,
-			TotalWithDonation: totalWithDonation,
-			Timestamp:         timestamp,
+		// Validate required fields
+		if formData.ItemName == "" || price == 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Item Name and Price are required.",
+			})
 		}
 
-		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, totalWithDonation-total)
-		return Render(ctx, http.StatusOK, templates.Base(templates.PurchaseConfirmation(purchaseInfo)))
+		// Handle the action (add, update, delete)
+		switch formData.Action {
+		case "add":
+			db.AddProduct(conn, formData.ItemName, formData.ItemImage, quantity, price, formData.Inactive)
+		case "update":
+			// Handle update logic here
+		case "delete":
+			// Handle delete logic here
+		default:
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid action.",
+			})
+		}
+		Products, err = db.GetAllProducts(conn)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Products failed",
+			})
+		}
+
+		// Respond with a success message and the updated list of products
+		return ctx.JSON(http.StatusOK, map[string]interface{}{
+			"message":  "Product action successful",
+			"products": Products, // Assuming Products is updated
+		})
 	})
+	// e.GET("/products", func(ctx echo.Context) error {
+	// 	// Fetch the products from the database
+	// 	Products, err := db.GetAllProducts(conn)
+	// 	if err != nil {
+	// 		return ctx.JSON(http.StatusBadRequest, map[string]string{
+	// 			"error": "Failed to fetch products",
+	// 		})
+	// 	}
+
+	// 	// Respond with the products
+	// 	return ctx.JSON(http.StatusOK, map[string]interface{}{
+	// 		"products": Products,
+	// 	})
+	// })
 
 	e.POST("/purchasebrief", func(ctx echo.Context) error {
 		firstName := ctx.FormValue("firstName")

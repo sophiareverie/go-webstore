@@ -11,7 +11,7 @@ import (
 
 // GetAllProducts retrieves all products from the database
 func GetAllProducts(conn *sql.DB) ([]types.Product, error) {
-	rows, err := conn.Query("SELECT id, product_name, image_name, price, in_stock FROM product")
+	rows, err := conn.Query("SELECT id, product_name, image_name, price, in_stock, inactive FROM product")
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func GetAllProducts(conn *sql.DB) ([]types.Product, error) {
 	var products []types.Product
 	for rows.Next() {
 		var product types.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Image, &product.Price, &product.InStock); err != nil {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Image, &product.Price, &product.InStock, &product.Inactive); err != nil {
 			return nil, err
 		}
 		products = append(products, product)
@@ -250,4 +250,24 @@ func GetProductQuantity(conn *sql.DB, productName string) (int, error) {
 	}
 
 	return inStock, nil
+}
+
+func AddProduct(conn *sql.DB, itemName string, itemImage string, quantity int, price float64, inactive int) error {
+	// Prepare the SQL statement for inserting a new product
+	stmt, err := conn.Prepare(`
+        INSERT INTO product (product_name, image_name, price, in_stock, inactive)
+        VALUES (?, ?, ?, ?, ?)
+    `)
+	if err != nil {
+		return fmt.Errorf("error preparing SQL statement: %v", err)
+	}
+	defer stmt.Close()
+
+	// Execute the insert statement with the provided values
+	_, err = stmt.Exec(itemName, itemImage, price, quantity, inactive)
+	if err != nil {
+		return fmt.Errorf("error executing SQL statement: %v", err)
+	}
+
+	return nil
 }

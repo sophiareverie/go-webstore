@@ -29,7 +29,7 @@ func Base(content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>Go Webstore</title><link rel=\"stylesheet\" href=\"assets/styles/styles.css\"></head><div class=\"nav\"><a href=\"/store\">Store</a> <a href=\"/dbQueries\">View All Tables</a> <a href=\"/admin\">Admin</a> <a href=\"/order_entry\">Order Entry</a></div><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>Go Webstore</title><link rel=\"stylesheet\" href=\"assets/styles/styles.css\"></head><div class=\"nav\"><a href=\"/store\">Store</a> <a href=\"/dbQueries\">View All Tables</a> <a href=\"/admin\">Admin</a> <a href=\"/order_entry\">Order Entry</a> <a href=\"/products\">Products</a></div><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
