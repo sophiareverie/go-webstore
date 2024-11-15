@@ -158,7 +158,6 @@ templ OrderEntry() {
                 fetch(`/get_customers?searchTerm=${encodeURIComponent(value)}`)
                     .then(response => response.json())
                     .then(data => {
-                        //console.log("Response data:", data); 
 
                         const tableBody = document.getElementById("customerList");
                         tableBody.innerHTML = "";

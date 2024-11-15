@@ -155,17 +155,17 @@ func main() {
 
 	e.POST("/product", func(ctx echo.Context) error {
 		var formData struct {
-			ItemName  string `json:"itemName"`
-			ItemImage string `json:"itemImage"`
-			Quantity  string `json:"quantity"`
-			Price     string `json:"price"`
-			Inactive  int    `json:"inactive"`
-			Action    string `json:"action"`
+			ProductID int     `json:"productID"`
+			ItemName  string  `json:"itemName"`
+			ItemImage string  `json:"itemImage"`
+			Quantity  int     `json:"quantity"`
+			Price     float64 `json:"price"`
+			Inactive  int     `json:"inactive"`
+			Action    string  `json:"action"`
 		}
 
-		// Bind the incoming JSON data to the struct
 		if err := ctx.Bind(&formData); err != nil {
-			fmt.Println("Error binding data:", err) // Log the error
+			fmt.Println("Error binding data:", err)
 			return ctx.JSON(http.StatusBadRequest, map[string]string{
 				"error": fmt.Sprintf("Error binding data: %v", err),
 			})
@@ -182,35 +182,14 @@ func main() {
 			})
 		}
 
-		quantity, err := strconv.Atoi(formData.Quantity) // Convert string to int
-		if err != nil {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid quantity value",
-			})
-		}
-
-		price, err := strconv.ParseFloat(formData.Price, 64) // Convert string to float64
-		if err != nil {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid price value",
-			})
-		}
-
-		// Validate required fields
-		if formData.ItemName == "" || price == 0 {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Item Name and Price are required.",
-			})
-		}
-
-		// Handle the action (add, update, delete)
 		switch formData.Action {
 		case "add":
-			db.AddProduct(conn, formData.ItemName, formData.ItemImage, quantity, price, formData.Inactive)
+			db.AddProduct(conn, formData.ItemName, formData.ItemImage, formData.Quantity, formData.Price, formData.Inactive)
 		case "update":
-			// Handle update logic here
+
+			db.UpdateProduct(conn, formData.ProductID, formData.ItemName, formData.ItemImage, formData.Quantity, formData.Price, formData.Inactive)
 		case "delete":
-			// Handle delete logic here
+			db.DeleteProduct(conn, formData.ProductID)
 		default:
 			return ctx.JSON(http.StatusBadRequest, map[string]string{
 				"error": "Invalid action.",
@@ -223,26 +202,40 @@ func main() {
 			})
 		}
 
-		// Respond with a success message and the updated list of products
 		return ctx.JSON(http.StatusOK, map[string]interface{}{
 			"message":  "Product action successful",
-			"products": Products, // Assuming Products is updated
+			"products": Products,
 		})
 	})
-	// e.GET("/products", func(ctx echo.Context) error {
-	// 	// Fetch the products from the database
-	// 	Products, err := db.GetAllProducts(conn)
-	// 	if err != nil {
-	// 		return ctx.JSON(http.StatusBadRequest, map[string]string{
-	// 			"error": "Failed to fetch products",
-	// 		})
-	// 	}
+	e.POST("/product-id", func(ctx echo.Context) error {
 
-	// 	// Respond with the products
-	// 	return ctx.JSON(http.StatusOK, map[string]interface{}{
-	// 		"products": Products,
-	// 	})
-	// })
+		var formData struct {
+			ItemName  string  `json:"itemName"`
+			ItemImage string  `json:"itemImage"`
+			Quantity  int     `json:"quantity"`
+			Price     float64 `json:"price"`
+			Inactive  int     `json:"inactive"`
+		}
+		if err := ctx.Bind(&formData); err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid data",
+			})
+		}
+
+		var productID int
+		err := conn.QueryRow(`
+			SELECT id FROM product
+			WHERE product_name = ? AND image_name = ? AND price = ? AND in_stock = ? AND inactive = ?
+		`, formData.ItemName, formData.ItemImage, formData.Price, formData.Quantity, formData.Inactive).Scan(&productID)
+		if err != nil {
+			return ctx.JSON(http.StatusNotFound, map[string]string{
+				"error": "Product not found",
+			})
+		}
+		return ctx.JSON(http.StatusOK, map[string]interface{}{
+			"id": productID,
+		})
+	})
 
 	e.POST("/purchasebrief", func(ctx echo.Context) error {
 		firstName := ctx.FormValue("firstName")
@@ -265,10 +258,7 @@ func main() {
 		subtotal := price * float64(quantityInt)
 		tax := subtotal * 0.06
 		total := subtotal + tax
-		// fmt.Printf("%d", productID)
-		// fmt.Printf("%d", customerID)
 
-		// Add the order to the database
 		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, 0)
 
 		confirmationMessage := fmt.Sprintf(`

@@ -164,7 +164,6 @@ func AddOrder(conn *sql.DB, productID, customerID, quantity int, price, tax, don
 	return orderID, nil
 }
 
-// GetCustomerByID retrieves a customer by their ID
 func GetCustomerByID(conn *sql.DB, id int) (types.Customer, error) {
 	var customer types.Customer
 	err := conn.QueryRow("SELECT id, first_name, last_name, email FROM customer WHERE id = ?", id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Email)
@@ -177,7 +176,6 @@ func GetCustomerByID(conn *sql.DB, id int) (types.Customer, error) {
 	return customer, nil
 }
 
-// GetCustomerByEmail retrieves a customer by their email
 func GetCustomerByEmail(conn *sql.DB, email string) (types.Customer, error) {
 	var customer types.Customer
 	err := conn.QueryRow("SELECT id, first_name, last_name, email FROM customer WHERE email = ?", email).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Email)
@@ -267,6 +265,61 @@ func AddProduct(conn *sql.DB, itemName string, itemImage string, quantity int, p
 	_, err = stmt.Exec(itemName, itemImage, price, quantity, inactive)
 	if err != nil {
 		return fmt.Errorf("error executing SQL statement: %v", err)
+	}
+
+	return nil
+}
+func UpdateProduct(conn *sql.DB, productID int, itemName string, itemImage string, quantity int, price float64, inactive int) error {
+	query := `UPDATE product SET product_name = ?`
+	params := []interface{}{itemName}
+
+	if itemImage != "" {
+		query += ", image_name = ?"
+		params = append(params, itemImage)
+	}
+
+	if quantity >= 0 {
+		query += ", in_stock = ?"
+		params = append(params, quantity)
+	}
+
+	if price >= 0 {
+		query += ", price = ?"
+		params = append(params, price)
+	}
+
+	query += ", inactive = ? WHERE id = ?"
+	params = append(params, inactive, productID)
+
+	stmt, err := conn.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("error preparing SQL statement for update: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(params...)
+	if err != nil {
+		return fmt.Errorf("error executing SQL statement for update: %v", err)
+	}
+
+	return nil
+}
+
+func DeleteProduct(conn *sql.DB, productID int) error {
+	fmt.Printf("%d", productID)
+	stmt, err := conn.Prepare(`
+        DELETE FROM product
+        WHERE id = ?
+    `)
+	if err != nil {
+		return fmt.Errorf("error preparing SQL statement for delete: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(productID)
+	if err != nil {
+		fmt.Printf("here")
+		return fmt.Errorf("error executing SQL statement for delete: %v", err)
 	}
 
 	return nil
