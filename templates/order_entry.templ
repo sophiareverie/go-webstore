@@ -3,9 +3,10 @@ package templates
 import (
 	"fmt"
 	"time"
+    "go-store/types"
 )
 
-templ OrderEntry() {
+templ OrderEntry(Products []types.Product) {
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -79,9 +80,12 @@ templ OrderEntry() {
                             <label for="product">Product*:</label>
                             <select id="product" name="product" required onchange="updateAvailableQuantity()">
                                 <option value="">Select an item</option>
-                                <option value="Spoon">Spoon - $1.00</option>
-                                <option value="Fork">Fork - $1.50</option>
-                                <option value="Knife">Knife - $2.00</option>
+
+                                for _, product := range Products {
+                                if (product.Inactive == 0) {
+                                    <option value={ product.Name } > { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
+                                }
+                            }
                             </select>
 
                             <label for="available">Available Quantity:</label>

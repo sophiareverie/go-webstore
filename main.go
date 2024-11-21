@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 
 	"go-store/db"
@@ -18,12 +19,14 @@ import (
 	etag "github.com/pablor21/echo-etag/v4"
 )
 
-var conn *sql.DB
 var CustomerResults types.CustomerResults
 var OrdersFr []types.Order
 var Orders []types.Order
 var checker = ""
 var Products []types.Product
+var sessionuser types.SessionUser
+
+var store = sessions.NewCookieStore([]byte("secret-key"))
 
 func initialize(conn *sql.DB) {
 	var err error
@@ -46,6 +49,7 @@ func initialize(conn *sql.DB) {
 }
 
 func main() {
+
 	var err error
 
 	cfg := mysql.Config{
@@ -67,15 +71,106 @@ func main() {
 	e.Use(etag.Etag())
 	e.Static("assets", "./assets")
 
-	// TODO: Render your base store page here
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			session, _ := store.Get(c.Request(), "session")
+			c.Set("session", session)
+			return next(c)
+		}
+	})
+
+	e.GET("/", func(ctx echo.Context) error {
+		initialize(conn)
+		errorMsg := ctx.QueryParam("error")
+
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.Login(errorMsg)))
+	})
+
+	e.POST("/logout", func(ctx echo.Context) error {
+		sessionuser.First = ""
+		sessionuser.Last = ""
+		sessionuser.Username = ""
+		sessionuser.Role = 0
+
+		session, _ := store.Get(ctx.Request(), "session")
+		session.Options.MaxAge = -1
+		session.Values = make(map[interface{}]interface{})
+		session.Save(ctx.Request(), ctx.Response())
+
+		return ctx.Redirect(http.StatusFound, "/")
+	})
+
+	e.POST("/login", func(ctx echo.Context) error {
+		initialize(conn)
+
+		email := ctx.FormValue("email")
+		password := ctx.FormValue("password")
+
+		// Query the database for the user
+		user, err := db.GetUserByEmailAndPassword(conn, email, password)
+		if err != nil {
+			return ctx.Redirect(http.StatusFound, "/?error=Invalid credentials")
+		}
+		sessionuser.First = user.FirstName
+		sessionuser.Last = user.LastName
+		sessionuser.Username = user.Email
+		sessionuser.Role = user.Role
+
+		session, _ := store.Get(ctx.Request(), "session")
+
+		session.Values["userID"] = user.ID
+		session.Values["email"] = user.Email
+		session.Values["role"] = user.Role
+		session.Save(ctx.Request(), ctx.Response())
+
+		// Redirect based on user role
+		if user.Role == 1 {
+			return ctx.Redirect(http.StatusFound, "/order_entry")
+		} else if user.Role == 2 {
+			return ctx.Redirect(http.StatusFound, "/products")
+		}
+
+		return ctx.Redirect(http.StatusFound, "/?error=unknown_role")
+	})
+
+	e.POST("/guest", func(ctx echo.Context) error {
+
+		session, err := store.Get(ctx.Request(), "session")
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to initialize session"})
+		}
+
+		// Set guest status in session
+		session.Values["guest"] = true
+		session.Values["role"] = 0
+
+		if err := session.Save(ctx.Request(), ctx.Response()); err != nil {
+			return ctx.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to save session"})
+		}
+
+		// Redirect to order entry page
+		err = ctx.Redirect(http.StatusFound, "/store")
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to redirect"})
+		}
+
+		return nil
+	})
+
 	e.GET("/store", func(ctx echo.Context) error {
 		initialize(conn)
 
-		return Render(ctx, http.StatusOK, templates.Base(templates.Store(Products)))
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.Store(Products)))
 	})
 
 	e.GET("/dbQueries", func(ctx echo.Context) error {
 		initialize(conn)
+		session, _ := store.Get(ctx.Request(), "session")
+		role, ok := session.Values["role"].(int)
+
+		if !ok || role == 0 {
+			return ctx.Redirect(http.StatusFound, "/?error=Must log in first!")
+		}
 
 		CustomerResults.Customer2, err = db.GetCustomerByID(conn, 2)
 		CustomerResults.Customer3Find, err = db.GetCustomerByID(conn, 3)
@@ -95,16 +190,45 @@ func main() {
 		var QuantityRemaining2 int
 		QuantityRemaining2, err = db.SellProduct(conn, 3, 10)
 
-		return Render(ctx, http.StatusOK, templates.Base(templates.Queries(CustomerResults, Orders, Products, QuantityRemaining1, QuantityRemaining2)))
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.Queries(CustomerResults, Orders, Products, QuantityRemaining1, QuantityRemaining2)))
 	})
 
 	e.GET("/admin", func(ctx echo.Context) error {
 		initialize(conn)
-		return Render(ctx, http.StatusOK, templates.Base(templates.Admin(CustomerResults, OrdersFr, Products, checker)))
+		session, _ := store.Get(ctx.Request(), "session")
+		role, ok := session.Values["role"].(int)
+
+		if !ok || role == 0 {
+			return ctx.Redirect(http.StatusFound, "/?error=Must log in first!")
+		}
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.Admin(CustomerResults, OrdersFr, Products, checker)))
 	})
 
 	e.GET("/products", func(ctx echo.Context) error {
-		return Render(ctx, http.StatusOK, templates.Base(templates.Products(Products)))
+		session, _ := store.Get(ctx.Request(), "session")
+		role, ok := session.Values["role"].(int)
+
+		if !ok || role == 0 {
+			return ctx.Redirect(http.StatusFound, "/?error=Must log in first!")
+		}
+		if role < 2 {
+			return ctx.Redirect(http.StatusFound, "/?error=You are not authorized for that page!")
+		}
+
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.Products(Products)))
+	})
+
+	e.GET("/order_entry", func(ctx echo.Context) error {
+		initialize(conn)
+		session, _ := store.Get(ctx.Request(), "session")
+		role, ok := session.Values["role"].(int)
+
+		if !ok || role == 0 {
+			return ctx.Redirect(http.StatusFound, "/?error=Must log in first!")
+		}
+
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.OrderEntry(Products)))
+
 	})
 
 	e.GET("/get_product_quantity", func(ctx echo.Context) error {
@@ -117,6 +241,7 @@ func main() {
 
 		return ctx.JSON(http.StatusOK, map[string]int{"quantity": quantity})
 	})
+
 	e.GET("/get_customers", func(ctx echo.Context) error {
 		initialize(conn)
 
@@ -146,13 +271,6 @@ func main() {
 		return ctx.JSON(http.StatusOK, filteredCustomers)
 	})
 
-	e.GET("/order_entry", func(ctx echo.Context) error {
-		initialize(conn)
-
-		return Render(ctx, http.StatusOK, templates.Base(templates.OrderEntry()))
-
-	})
-
 	e.POST("/product", func(ctx echo.Context) error {
 		var formData struct {
 			ProductID int     `json:"productID"`
@@ -165,7 +283,6 @@ func main() {
 		}
 
 		if err := ctx.Bind(&formData); err != nil {
-			fmt.Println("Error binding data:", err)
 			return ctx.JSON(http.StatusBadRequest, map[string]string{
 				"error": fmt.Sprintf("Error binding data: %v", err),
 			})

@@ -31,7 +31,7 @@ templ Store(Products []types.Product) {
                             <option value="">Select an item</option>
                             for _, product := range Products {
                                 if (product.Inactive == 0) {
-                                    <option value={ product.Name } > { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
+                                    <option value={ product.Image } > { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
                                 }
                             }
                         </select>

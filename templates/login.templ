@@ -1,0 +1,147 @@
+package templates
+
+import (
+
+)
+
+templ Login(errorMsg string) {
+    <!DOCTYPE html>
+    <head>
+        <link rel="stylesheet" href="../assets/styles/styles.css">
+    </head>
+    <body>
+    <title>Login</title>
+    <style>
+        .body {
+            align-items: center;
+            display:flex;
+            justify-content: center;
+        }
+
+        fieldset{
+            min-width: 600px;
+            padding: 20px;
+            max-width: 800px;
+            
+        }       
+        .login{
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+
+
+        }
+        .guest{
+            border: none; 
+            background-color: grey;
+            box-shadow: none;
+        }
+
+        legend {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+
+
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            height: 45px;
+            padding: 10px;
+            font-size: 25px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+        }
+
+        button[type="submit"] {
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            width:100%;
+
+            
+        }
+
+        button[type="submit"]:hover {
+            background-color: lightgreen;
+            
+        }
+
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .additional-options {
+            margin-top: 20px;
+        }
+
+        .guest-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+    </style>
+
+    <fieldset class="guest">
+        <div class="errormess" style="color:red; font-weight:bold">
+            <p >{ errorMsg }</p>
+        </div>
+
+
+        <p> Welcome! Please login or continue as guest.</p>
+        <fieldset class="login">
+            <legend>Login</legend>
+            <div class="form-fields">
+                <form id="login-form" action="/login" method="post">
+                    <!-- Email Input -->
+                    <label for="email">Email*:</label>
+                    <input type="email" id="email" name="email" placeholder="example@domain.com" required />
+
+                    <!-- Password Input -->
+                    <label for="password">Password*:</label>
+                    <input type="password" id="password" name="password" required />
+
+                    <!-- Remember Me Option -->
+                    <div class="remember-me-container">
+                        <input type="checkbox" id="remember-me" name="remember-me" />
+                        <label for="remember-me">Remember Me</label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit">Login</button>
+                </form>
+
+                <!-- Additional Links -->
+                <div class="additional-options">
+                    <a href="/forgot-password">Forgot Password?</a>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="guest-container">
+            <form action="/guest" method="post">
+                <button type="submit">Continue as Guest</button>
+            </form>
+        </div>
+    </fieldset>
+</body>
+
+}

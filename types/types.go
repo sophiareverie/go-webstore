@@ -1,5 +1,12 @@
 package types
 
+type SessionUser struct {
+	Role     int
+	Username string
+	First    string
+	Last     string
+}
+
 type Product struct {
 	ID       int
 	Name     string
@@ -14,6 +21,15 @@ type Customer struct {
 	FirstName string
 	LastName  string
 	Email     string
+}
+
+type User struct {
+	ID        int
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
+	Role      int
 }
 
 type Order struct {

@@ -306,7 +306,6 @@ func UpdateProduct(conn *sql.DB, productID int, itemName string, itemImage strin
 }
 
 func DeleteProduct(conn *sql.DB, productID int) error {
-	fmt.Printf("%d", productID)
 	stmt, err := conn.Prepare(`
         DELETE FROM product
         WHERE id = ?
@@ -318,9 +317,22 @@ func DeleteProduct(conn *sql.DB, productID int) error {
 
 	_, err = stmt.Exec(productID)
 	if err != nil {
-		fmt.Printf("here")
 		return fmt.Errorf("error executing SQL statement for delete: %v", err)
 	}
 
 	return nil
+}
+
+func GetUserByEmailAndPassword(conn *sql.DB, email string, password string) (types.User, error) {
+	var user types.User
+	err := conn.QueryRow("SELECT id, first_name, last_name, email, password, role FROM users WHERE email = ? AND password = ?", email, password).
+		Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.Role)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New("user not found")
+		}
+		return user, err
+	}
+	return user, nil
+
 }

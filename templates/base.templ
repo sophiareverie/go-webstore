@@ -1,24 +1,82 @@
 package templates
+import(
+	"go-store/types"
 
-templ Base(content templ.Component) {
+)
+
+templ Base( user types.SessionUser, content templ.Component) {
 	<!DOCTYPE html>
 	<html>
-	<head>
-		<title>Go Webstore</title>
-		<link rel="stylesheet" href="assets/styles/styles.css">
-	</head>
-	<div class="nav">
-		<a href="/store">Store</a>
-		<a href="/dbQueries">View All Tables</a>
-		<a href="/admin">Admin</a>
-		<a href="/order_entry">Order Entry</a>
-		<a href="/products">Products</a>
-	</div>
-	
-	<body>
+
+		<head>
+			<title>Go Webstore</title>
+			<link rel="stylesheet" href="assets/styles/styles.css">
+		</head>
+
+
+		if (user.Role == 1) {
+
+			<div class="nav">
+				<div class="choices-container">
+					<a href="/">Login</a>
+					<a href="/store">Store</a>
+					<a href="/dbQueries">View All Tables</a>
+					<a href="/admin">Admin</a>
+					<a href="/order_entry">Order Entry</a>
+					// <a href="/products">Products</a>
+				</div>
+				<div class="logout-container">
+					<p> Welcome, { user.First } { user.Last }!</p>
+					<form action="/logout" method="post">
+						<button type="submit">Logout</button>
+					</form>
+				</div>
+			</div>
+
+	} else if (user.Role == 2)  {
+		<div class="nav">
+				<div class="choices-container">
+					<a href="/">Login</a>
+					<a href="/store">Store</a>
+					<a href="/dbQueries">View All Tables</a>
+					<a href="/admin">Admin</a>
+					<a href="/order_entry">Order Entry</a>
+					<a href="/products">Products</a>
+				</div>
+				<div class="logout-container">
+					<p> Welcome, { user.First } { user.Last }!</p>
+					<form action="/logout" method="post">
+						<button type="submit">Logout</button>
+					</form>
+				</div>
+			</div>
+		
+	} else {
+		<div class="nav">
+			<div class="choices-container">
+				<a href="/">Login</a>
+				<a href="/store">Store</a>
+				// <a href="/dbQueries">View All Tables</a>
+				// <a href="/admin">Admin</a>
+				// <a href="/order_entry">Order Entry</a>
+				// <a href="/products">Products</a>
+				
+			</div>
+		</div>
+
+	}
 		@header()
-		@content
+		<body>
+			<div class="body">
+					@content
+			</div>
+		</body>
 		@footer()
-	</body>
 	</html>
+
+
+	
+	
+
+	
 }
