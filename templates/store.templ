@@ -16,7 +16,7 @@ templ Store(Products []types.Product) {
             <legend>Product Information</legend>
             <div class="form-container">
                 <div class="form-fields">
-                    <form action="/purchase" method="post">
+                    <form action="/purchase" method="post"  onsubmit="trackPurchasedProduct()">
                         <label for="firstName">First Name*:</label>
                         <input type="text" id="firstName" name="firstName" required pattern="[A-Za-z\s']+" />
 
@@ -31,7 +31,7 @@ templ Store(Products []types.Product) {
                             <option value="">Select an item</option>
                             for _, product := range Products {
                                 if (product.Inactive == 0) {
-                                    <option value={ product.Image } > { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
+                                    <option value={ product.Name } data-image={ product.Image}> { product.Name } - { fmt.Sprintf("%.2f", product.Price) } </option>
                                 }
                             }
                         </select>
@@ -61,19 +61,85 @@ templ Store(Products []types.Product) {
 		
     </body>
     <script>
+
+        window.onload = function() {
+            deleteCookie("viewedItems");  
+            deleteCookie("purchasedItem");  
+        };
+
+        function trackPurchasedProduct() {
+            const productSelect = document.getElementById("product");
+            const selectedProduct = productSelect.value; // Get the selected product name
+            console.log(selectedProduct)
+
+            if (selectedProduct) {
+                setCookie("purchasedItem", selectedProduct, 7); // Set the purchased item in the cookie for 7 days
+            }
+        }
+
         function showProductImage() {
             const productSelect = document.getElementById("product");
             const productImage = document.getElementById("productImage");
-            const product = productSelect.value;
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+
+            const product = selectedOption.getAttribute("data-image");
 
             if (product) {
                 productImage.src = product;
-                productImage.alt = product + " image"; 
+                productImage.alt = product + " image";
+                trackViewedProduct(productSelect.value);
             } else {
-                productImage.src = ""; 
-                productImage.alt = "Product image"; 
+                productImage.src = "";
+                productImage.alt = "Product image";
+            }
+            
+
+        }
+
+        function trackViewedProduct(product) {
+            console.log(product)
+            const viewedItems = getCookie("viewedItems") ? JSON.parse(decodeURIComponent(getCookie("viewedItems"))) : [];
+            console.log(viewedItems)
+
+            // Add item to the list only if not already there and not the default
+            if (!viewedItems.includes(product)) {
+                viewedItems.push(product);
+                setCookie("viewedItems", encodeURIComponent(JSON.stringify(viewedItems)), 7); // Save to cookie
+                console.log("Tracked viewed item:", viewedItems);
             }
         }
+
+
+        // Set a cookie
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        }
+
+        // Get a cookie
+        function getCookie(name) {
+            const cookies = document.cookie.split("; ");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].split("=");
+                if (cookie[0] === name) {
+                    return cookie[1];
+                }
+            }
+            return "";
+        }
+
+        // Function to delete a specific cookie by name
+        function deleteCookie(name) {
+            const date = new Date();
+            date.setTime(date.getTime() - 1);  // Set the time to the past
+            document.cookie = `${name}=;expires=${date.toUTCString()};path=/`;
+        }
+
+
+
+
+
     </script>
 }
 

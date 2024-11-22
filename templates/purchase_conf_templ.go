@@ -34,14 +34,14 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h2>Purchase Confirmation</h2><p>Thanks for visitin, ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><link rel=\"stylesheet\" href=\"../assets/styles/styles.css\"></head><style>\n        .hidden {\n            display: none;\n        }\n    </style><body><div><h2>Purchase Confirmation</h2><p>Thanks for visitin, ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%s", purchaseInformation.FirstName))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 11, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 24, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -54,7 +54,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", purchaseInformation.Quantity))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 12, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 25, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -67,7 +67,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%s", purchaseInformation.Product))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 12, Col: 125}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 25, Col: 125}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -80,7 +80,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", purchaseInformation.Subtotal))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 13, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 26, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -93,7 +93,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", purchaseInformation.Tax))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 14, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 27, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -106,7 +106,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", purchaseInformation.Total))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 15, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 28, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -124,7 +124,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", purchaseInformation.DonationAmount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 17, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 30, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -137,7 +137,7 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", purchaseInformation.TotalWithDonation))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 18, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 31, Col: 102}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -155,13 +155,13 @@ func PurchaseConfirmation(purchaseInformation types.PurchaseInfo) templ.Componen
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%s", purchaseInformation.Email))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 20, Col: 105}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/purchase_conf.templ`, Line: 33, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(".</p></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(".</p></div><div id=\"viewedItems\" class=\"viewed-items\" type=\"hidden\"><h3>Items You Viewed But Did Not Purchase:</h3><ul id=\"viewedItemsList\"></ul></div><script>\n        window.onload = function() {\n                updateViewedItemsList();\n        }\n        function getCookie(name) {\n            const cookies = document.cookie.split(\"; \");\n            for (let i = 0; i < cookies.length; i++) {\n                const cookie = cookies[i].split(\"=\");\n                if (cookie[0] === name) {\n                    return decodeURIComponent(cookie[1]);\n                }\n            }\n            return \"\";\n        }\n\n\n        function setCookie(name, value, days) {\n            const date = new Date();\n            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);\n            document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;\n        }\n\n        // Update the list of viewed but not purchased items\n        function updateViewedItemsList() {\n            const viewedItems = getCookie(\"viewedItems\") ? JSON.parse(decodeURIComponent(getCookie(\"viewedItems\"))) : [];\n            const purchasedItem = getCookie(\"purchasedItem\");\n            console.log(purchasedItem)\n            const list = document.getElementById(\"viewedItemsList\");\n            const section = document.getElementById(\"viewedItems\");\n\n\n            // Clear the current list\n            list.innerHTML = \"\";\n\n            // Filter out the purchased item from the viewed items\n            const filteredItems = viewedItems.filter(item => item !== purchasedItem);\n            console.log(filteredItems)\n\n            // Display the filtered viewed items\n            if (filteredItems.length === 0) {\n                section.classList.add(\"hidden\");\n\n            } else {\n                filteredItems.forEach(item => {\n                    section.classList.remove(\"hidden\");\n\n                    const listItem = document.createElement(\"li\");\n                    listItem.textContent = item;\n                    list.appendChild(listItem);\n                });\n            }\n        }\n\n\n\n    </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

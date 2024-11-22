@@ -386,6 +386,49 @@ func main() {
 		return ctx.HTML(http.StatusOK, confirmationMessage)
 	})
 
+	e.POST("/purchase", func(ctx echo.Context) error {
+		firstName := ctx.FormValue("firstName")
+		lastName := ctx.FormValue("lastName")
+		email := ctx.FormValue("email")
+		customerID, _ := db.AddCustomer(conn, firstName, lastName, email)
+		product := ctx.FormValue("product")
+		var productObj types.Product
+		productObj, _ = db.GetProductByName(conn, product)
+		var productID = productObj.ID
+		quantity := ctx.FormValue("quantity")
+		timestamp := ctx.FormValue("timestamp")
+		quantityInt, err := strconv.Atoi(quantity)
+		if err != nil {
+			return ctx.String(http.StatusBadRequest, "Invalid quantity")
+		}
+		var price = productObj.Price
+		subtotal := price * float64(quantityInt)
+		tax := subtotal * 0.06
+		total := subtotal + tax
+		donation := ctx.FormValue("donation") == "yes"
+		donationAmount := 3.0 //3 dolla donation
+		totalWithDonation := total
+		if donation {
+			totalWithDonation += donationAmount
+		}
+		purchaseInfo := types.PurchaseInfo{
+			FirstName:         firstName,
+			LastName:          lastName,
+			Email:             email,
+			Quantity:          quantityInt,
+			Product:           product,
+			Subtotal:          subtotal,
+			Tax:               tax,
+			Total:             total,
+			Donation:          donation,
+			DonationAmount:    donationAmount,
+			TotalWithDonation: totalWithDonation,
+			Timestamp:         timestamp,
+		}
+		db.AddOrder(conn, productID, customerID, quantityInt, subtotal, tax, totalWithDonation-total)
+		return Render(ctx, http.StatusOK, templates.Base(sessionuser, templates.PurchaseConfirmation(purchaseInfo)))
+	})
+
 	e.Logger.Fatal(e.Start(":8000"))
 }
 

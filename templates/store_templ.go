@@ -35,7 +35,7 @@ func Store(Products []types.Product) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><head><link rel=\"stylesheet\" href=\"../assets/styles/styles.css\"></head><body><fieldset><legend>Product Information</legend><div class=\"form-container\"><div class=\"form-fields\"><form action=\"/purchase\" method=\"post\"><label for=\"firstName\">First Name*:</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required pattern=\"[A-Za-z\\s&#39;]+\"> <label for=\"lastName\">Last Name*:</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required pattern=\"[A-Za-z\\s&#39;]+\"> <label for=\"email\">Email*:</label> <input type=\"email\" id=\"email\" name=\"email\" required> <label for=\"product\">Product*:</label> <select id=\"product\" name=\"product\" required onchange=\"showProductImage()\"><option value=\"\">Select an item</option> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><head><link rel=\"stylesheet\" href=\"../assets/styles/styles.css\"></head><body><fieldset><legend>Product Information</legend><div class=\"form-container\"><div class=\"form-fields\"><form action=\"/purchase\" method=\"post\" onsubmit=\"trackPurchasedProduct()\"><label for=\"firstName\">First Name*:</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required pattern=\"[A-Za-z\\s&#39;]+\"> <label for=\"lastName\">Last Name*:</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required pattern=\"[A-Za-z\\s&#39;]+\"> <label for=\"email\">Email*:</label> <input type=\"email\" id=\"email\" name=\"email\" required> <label for=\"product\">Product*:</label> <select id=\"product\" name=\"product\" required onchange=\"showProductImage()\"><option value=\"\">Select an item</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,11 +46,24 @@ func Store(Products []types.Product) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var2 string
-				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(product.Image)
+				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" data-image=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(product.Image)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 93}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -58,12 +71,12 @@ func Store(Products []types.Product) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 string
-				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 110}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -71,12 +84,12 @@ func Store(Products []types.Product) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", product.Price))
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", product.Price))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 125}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 34, Col: 151}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -90,16 +103,16 @@ func Store(Products []types.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", time.Now().Unix()))
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", time.Now().Unix()))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/store.templ`, Line: 48, Col: 106}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <button type=\"submit\">Purchase</button></form></div><div class=\"product-image\"><h3 id=\"productTitle\">Select product to see image</h3><img id=\"productImage\" src=\"\" alt=\"Product image\"></div></div></fieldset></body><script>\n        function showProductImage() {\n            const productSelect = document.getElementById(\"product\");\n            const productImage = document.getElementById(\"productImage\");\n            const product = productSelect.value;\n\n            if (product) {\n                productImage.src = product;\n                productImage.alt = product + \" image\"; \n            } else {\n                productImage.src = \"\"; \n                productImage.alt = \"Product image\"; \n            }\n        }\n    </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <button type=\"submit\">Purchase</button></form></div><div class=\"product-image\"><h3 id=\"productTitle\">Select product to see image</h3><img id=\"productImage\" src=\"\" alt=\"Product image\"></div></div></fieldset></body><script>\n\n        window.onload = function() {\n            deleteCookie(\"viewedItems\");  \n            deleteCookie(\"purchasedItem\");  \n        };\n\n        function trackPurchasedProduct() {\n            const productSelect = document.getElementById(\"product\");\n            const selectedProduct = productSelect.value; // Get the selected product name\n            console.log(selectedProduct)\n\n            if (selectedProduct) {\n                setCookie(\"purchasedItem\", selectedProduct, 7); // Set the purchased item in the cookie for 7 days\n            }\n        }\n\n        function showProductImage() {\n            const productSelect = document.getElementById(\"product\");\n            const productImage = document.getElementById(\"productImage\");\n            const selectedOption = productSelect.options[productSelect.selectedIndex];\n\n            const product = selectedOption.getAttribute(\"data-image\");\n\n            if (product) {\n                productImage.src = product;\n                productImage.alt = product + \" image\";\n                trackViewedProduct(productSelect.value);\n            } else {\n                productImage.src = \"\";\n                productImage.alt = \"Product image\";\n            }\n            \n\n        }\n\n        function trackViewedProduct(product) {\n            console.log(product)\n            const viewedItems = getCookie(\"viewedItems\") ? JSON.parse(decodeURIComponent(getCookie(\"viewedItems\"))) : [];\n            console.log(viewedItems)\n\n            // Add item to the list only if not already there and not the default\n            if (!viewedItems.includes(product)) {\n                viewedItems.push(product);\n                setCookie(\"viewedItems\", encodeURIComponent(JSON.stringify(viewedItems)), 7); // Save to cookie\n                console.log(\"Tracked viewed item:\", viewedItems);\n            }\n        }\n\n\n        // Set a cookie\n        function setCookie(name, value, days) {\n            const date = new Date();\n            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);\n            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;\n        }\n\n        // Get a cookie\n        function getCookie(name) {\n            const cookies = document.cookie.split(\"; \");\n            for (let i = 0; i < cookies.length; i++) {\n                const cookie = cookies[i].split(\"=\");\n                if (cookie[0] === name) {\n                    return cookie[1];\n                }\n            }\n            return \"\";\n        }\n\n        // Function to delete a specific cookie by name\n        function deleteCookie(name) {\n            const date = new Date();\n            date.setTime(date.getTime() - 1);  // Set the time to the past\n            document.cookie = `${name}=;expires=${date.toUTCString()};path=/`;\n        }\n\n\n\n\n\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,11 +1,24 @@
 package templates
 
 import (
-"fmt"
-"go-store/types"
+    "fmt"
+    "go-store/types"
 )
 
 templ PurchaseConfirmation(purchaseInformation types.PurchaseInfo) {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <link rel="stylesheet" href="../assets/styles/styles.css">
+    </head>
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+
+    <body>
     <div>
         <h2>Purchase Confirmation</h2>
         <p>Thanks for visitin, { fmt.Sprintf("%s", purchaseInformation.FirstName) }!</p>
@@ -19,4 +32,68 @@ templ PurchaseConfirmation(purchaseInformation types.PurchaseInfo) {
         }
         <p>A confirmation email has hopefully been sent to { fmt.Sprintf("%s", purchaseInformation.Email) }.</p>
     </div>
+
+    <div id="viewedItems" class="viewed-items" type="hidden">
+        <h3>Items You Viewed But Did Not Purchase:</h3>
+            <ul id="viewedItemsList"></ul>
+    </div>
+
+    <script>
+        window.onload = function() {
+                updateViewedItemsList();
+        }
+        function getCookie(name) {
+            const cookies = document.cookie.split("; ");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].split("=");
+                if (cookie[0] === name) {
+                    return decodeURIComponent(cookie[1]);
+                }
+            }
+            return "";
+        }
+
+
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+        }
+
+        // Update the list of viewed but not purchased items
+        function updateViewedItemsList() {
+            const viewedItems = getCookie("viewedItems") ? JSON.parse(decodeURIComponent(getCookie("viewedItems"))) : [];
+            const purchasedItem = getCookie("purchasedItem");
+            console.log(purchasedItem)
+            const list = document.getElementById("viewedItemsList");
+            const section = document.getElementById("viewedItems");
+
+
+            // Clear the current list
+            list.innerHTML = "";
+
+            // Filter out the purchased item from the viewed items
+            const filteredItems = viewedItems.filter(item => item !== purchasedItem);
+            console.log(filteredItems)
+
+            // Display the filtered viewed items
+            if (filteredItems.length === 0) {
+                section.classList.add("hidden");
+
+            } else {
+                filteredItems.forEach(item => {
+                    section.classList.remove("hidden");
+
+                    const listItem = document.createElement("li");
+                    listItem.textContent = item;
+                    list.appendChild(listItem);
+                });
+            }
+        }
+
+
+
+    </script>
+</body>
+</html>
 }
